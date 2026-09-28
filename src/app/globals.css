@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   PORTAL DULLIMP — SISTEMA DE DESIGN
+   -------------------------------------------------------------------------
+   Tokens de cor, tipografia e acabamento da marca Dullimp (manual de marca).
+
+   Disciplina de paleta (obrigatoria):
+   - Navy      #163A5F -> cor dominante: header, footer, hero, titulos, botoes
+                          secundarios. E' a "base escura" da marca.
+   - Terracota #D47C4C -> acento quente, reservado ao CTA e a detalhes pontuais.
+   - Verde     #058A35 -> acento de identidade (a folha): selos, confirmacoes,
+                          detalhes. Nunca compete com o CTA.
+   - Cinza     #6B6B6B -> neutro tecnico: metadados, textos de apoio.
+   - Branco    #FFFFFF -> superficie de conteudo.
+
+   Contraste (WCAG AA, texto normal >= 4.5:1):
+   - branco sobre navy, sobre verde-deep e sobre terracota-deep: OK;
+   - branco sobre a terracota pura (3.1:1) e sobre o verde puro (4.48:1) NAO
+     passa para texto pequeno — por isso texto branco usa as variantes -deep,
+     e as cores puras ficam para fundos grandes, capas, icones e bordas.
+   ========================================================================= */
+
+@theme {
+  /* --- Cores de marca --- */
+  --color-brand-navy: #163a5f;
+  --color-brand-navy-deep: #0e2740; /* hover / profundidade */
+  --color-brand-navy-soft: #e8eef5; /* fundo tenue azulado */
+  --color-brand-green: #058a35;
+  --color-brand-green-deep: #046b29; /* texto/selo verde com contraste AA */
+  --color-brand-green-soft: #e6f4ea;
+  --color-brand-terracotta: #d47c4c;
+  --color-brand-terracotta-deep: #a9582f; /* CTA (branco sobre ela: 5:1) */
+  --color-brand-terracotta-dark: #8c4826; /* hover do CTA */
+  --color-brand-terracotta-soft: #fbefe8;
+  --color-brand-gray: #6b6b6b;
+
+  /* --- Neutros de apoio (sustentam a leitura) --- */
+  --color-surface: #ffffff;
+  --color-canvas: #f5f7f9;
+  --color-ink: #14202e;
+  --color-ink-muted: #4a5563;
+  --color-ink-faint: #6b6b6b;
+  --color-line: #e2e7ed;
+  --color-line-strong: #c9d1db;
+
+  /* --- Tipografia --- */
+  --font-display: var(--font-satoshi), "Satoshi", system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+
+  /* --- Ritmo / acabamento --- */
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgb(20 32 46 / 0.04), 0 8px 24px -12px rgb(20 32 46 / 0.16);
+  --shadow-card-hover: 0 2px 4px rgb(22 58 95 / 0.06), 0 18px 40px -16px rgb(22 58 95 / 0.28);
+}
+
+/* O produto e' deliberadamente "light-only": a identidade depende do navy
+   sobre superficies claras. Fixamos o esquema para que o navegador nao
+   aplique inversoes automaticas. */
+:root {
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compensa o header fixo ao navegar por ancoras (#categorias, #todos...) */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Satoshi Bold nos titulos, como pede o manual de marca. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Foco sempre visivel e com contraste suficiente (WCAG 2.4.7). */
+  :focus-visible {
+    outline: 3px solid var(--color-brand-navy);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Sobre fundo navy o anel de foco precisa ser claro para nao sumir. */
+  .on-navy :focus-visible {
+    outline-color: #ffffff;
+  }
+
+  ::selection {
+    background: var(--color-brand-terracotta-soft);
+    color: var(--color-brand-navy-deep);
+  }
+}
+
+/* Respeita quem pediu menos movimento no sistema operacional. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
