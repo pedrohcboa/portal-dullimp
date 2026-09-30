@@ -139,37 +139,11 @@ as $$
   select exists (select 1 from public.editores e where e.user_id = auth.uid());
 $$;
 
--- Bootstrap: o primeiro login no /admin promove o usuário a gestor quando a
--- allowlist ainda está vazia. Depois disso a função não faz mais nada.
-create or replace function public.reivindicar_primeiro_editor()
-returns boolean
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  ja_existe boolean;
-  usuario   uuid := auth.uid();
-  endereco  text;
-begin
-  if usuario is null then
-    return false;
-  end if;
-
-  select exists (select 1 from public.editores) into ja_existe;
-  if ja_existe then
-    return false;
-  end if;
-
-  select u.email into endereco from auth.users u where u.id = usuario;
-
-  insert into public.editores (user_id, email, nome, papel)
-  values (usuario, lower(coalesce(endereco, 'sem-email')), 'Primeiro gestor', 'editor')
-  on conflict (user_id) do nothing;
-
-  return true;
-end;
-$$;
+-- Não há "primeiro gestor automático": ninguém vira gestor sozinho. Gestor
+-- entra só por INSERT nesta tabela, feito por quem já administra o projeto
+-- (ver README, "Gestores"). A função de bootstrap das versões anteriores é
+-- removida aqui e em 0003_travar_gestores.sql.
+drop function if exists public.reivindicar_primeiro_editor();
 
 -- ---------------------------------------------------------------------
 -- 5. Allowlist de distribuidores (quem pode criar conta e ler o conteúdo)
@@ -406,7 +380,6 @@ $$;
 -- ---------------------------------------------------------------------
 revoke execute on function public.eh_editor()                                 from public, anon;
 revoke execute on function public.eh_distribuidor()                           from public, anon;
-revoke execute on function public.reivindicar_primeiro_editor()               from public, anon;
 revoke execute on function public.hook_restringir_signup(jsonb)               from public, anon, authenticated;
 revoke execute on function public.metricas_serie_diaria(integer)              from public, anon;
 revoke execute on function public.metricas_totais(integer)                    from public, anon;
@@ -417,7 +390,6 @@ revoke execute on function public.metricas_buscas(integer, integer)           fr
 
 grant execute on function public.eh_editor()                                 to authenticated;
 grant execute on function public.eh_distribuidor()                           to authenticated;
-grant execute on function public.reivindicar_primeiro_editor()               to authenticated;
 grant execute on function public.hook_restringir_signup(jsonb)               to supabase_auth_admin;
 grant execute on function public.metricas_serie_diaria(integer)              to authenticated;
 grant execute on function public.metricas_totais(integer)                    to authenticated;

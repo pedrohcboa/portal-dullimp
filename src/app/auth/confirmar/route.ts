@@ -42,5 +42,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/entrar?aviso=confirmado", origin));
   }
 
-  return NextResponse.redirect(new URL("/entrar?aviso=link-invalido", origin));
+  // Sem parâmetros na query: o Supabase mandou o resultado depois do "#"
+  // (fluxo implícito — ex.: conta criada fora do site), que o servidor não
+  // enxerga. Nesse fluxo o e-mail já foi confirmado no clique; como não dá
+  // para ter certeza daqui, o aviso é neutro.
+  return NextResponse.redirect(new URL("/entrar?aviso=verifique", origin));
 }

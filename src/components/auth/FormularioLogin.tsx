@@ -17,6 +17,11 @@ const AVISOS: Record<string, { tom: "sucesso" | "aviso"; texto: string }> = {
     tom: "sucesso",
     texto: "E-mail confirmado! Agora é só entrar com o seu e-mail e senha.",
   },
+  verifique: {
+    tom: "aviso",
+    texto:
+      "Se você acabou de clicar no link de confirmação, seu e-mail já deve estar confirmado: entre com seu e-mail e senha.",
+  },
   "link-invalido": {
     tom: "aviso",
     texto:

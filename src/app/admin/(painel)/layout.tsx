@@ -47,22 +47,13 @@ export default async function LayoutPainel({ children }: LayoutProps<"/admin">) 
 
   if (!user) redirect(AREAS.admin.login);
 
-  // Confere a allowlist. Na primeira vez (tabela vazia) o usuário logado é
-  // promovido automaticamente a gestor — ver `reivindicar_primeiro_editor`.
-  let { data: editor } = await supabase
+  // Confere a allowlist. Não existe promoção automática: gestor entra só
+  // por INSERT em `editores`, feito por quem já administra o projeto.
+  const { data: editor } = await supabase
     .from("editores")
     .select("user_id, nome, papel")
     .eq("user_id", user.id)
     .maybeSingle();
-
-  if (!editor) {
-    await supabase.rpc("reivindicar_primeiro_editor");
-    ({ data: editor } = await supabase
-      .from("editores")
-      .select("user_id, nome, papel")
-      .eq("user_id", user.id)
-      .maybeSingle());
-  }
 
   if (!editor) {
     return (

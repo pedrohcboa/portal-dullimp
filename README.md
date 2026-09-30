@@ -57,6 +57,9 @@ No **SQL Editor**, rode em ordem os arquivos de `supabase/migrations/`:
    métricas e as três categorias da Dullimp. É idempotente: pode rodar de novo.
 2. `0002_dados_de_exemplo.sql` — quatro links de exemplo (opcional; apontam
    para example.com).
+3. `0003_travar_gestores.sql` — remove o antigo “primeiro gestor automático”
+   de bancos criados com versões anteriores do 0001 (num banco novo não faz
+   nada; pode rodar sem medo).
 
 ### 3. Autenticação (Dashboard → Authentication)
 
@@ -78,12 +81,18 @@ No **SQL Editor**, rode em ordem os arquivos de `supabase/migrations/`:
 
 ### 4. Primeiro gestor (antes de ativar o hook)
 
-Com o hook ainda desligado, o cadastro está aberto — e isso não expõe nada,
-porque a RLS só mostra conteúdo a quem está numa das allowlists.
+Ninguém vira gestor sozinho — não existe promoção automática. Com o hook
+ainda desligado, o cadastro está aberto (isso não expõe nada: a RLS só mostra
+conteúdo a quem está numa das allowlists):
 
-1. Crie sua conta em `/cadastro` e confirme o e-mail;
-2. entre em `/admin/login`. Como a tabela `editores` está vazia, o primeiro
-   login vira gestor automaticamente (`reivindicar_primeiro_editor()`).
+1. crie sua conta em `/cadastro` e confirme o e-mail;
+2. no SQL Editor, coloque-se em `editores`:
+   ```sql
+   insert into public.editores (user_id, email, nome)
+   select id, lower(email), 'Seu nome' from auth.users
+   where email = 'voce@dullimp.com.br';
+   ```
+3. entre em `/admin/login`.
 
 Demais gestores: veja [Gestores](#gestores).
 
@@ -151,8 +160,10 @@ precisa estar ligada.
 
 ### Gestores
 
-`editores` é a allowlist do `/admin`, ligada à conta (`user_id`). Para liberar
-um novo gestor:
+`editores` é a allowlist do `/admin`, ligada à conta (`user_id`). **Não há
+cadastro de gestor pela interface nem promoção automática**: o `/admin` só faz
+login, e quem entra na tabela é decidido por quem já administra o projeto no
+SQL Editor. Para liberar um novo gestor:
 
 1. adicione o e-mail dele em **Distribuidores** no painel (libera o cadastro);
 2. ele cria a conta em `/cadastro` e confirma o e-mail;
